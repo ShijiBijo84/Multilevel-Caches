@@ -1,0 +1,84 @@
+load /Users/shiji/PMA/papers/upscale/implementations/maude-new-vers/maude-multilevel-cache/multilevel-core-config.maude
+***load multilevel-core-config.maude 
+
+mod CACHE-LINE-DATA is 
+   pr CORE-INTERFACE{Address, Status} * (sort EntrySet{Address, Status} to MemoryPartition) .
+endm
+  
+view MemoryPartition from TRIV to CACHE-LINE-DATA is 
+  sort Elt to MemoryPartition .
+endv
+  
+mod CACHE-LINE-SET{K :: TRIV} is
+  pr SET{MemoryPartition}  .
+endm
+  
+mod CACHE-LINE-SET-MAP is 
+   pr CACHE-LINE-SET{MemoryPartition} * (sort Set{MemoryPartition} to MemoryMap) .
+endm
+  
+ 
+view MemoryMap from TRIV to CACHE-LINE-SET-MAP is 
+  sort Elt to MemoryMap .
+endv
+  
+  
+mod CACHE-DATA-SET is 
+	pr SET{Int} .
+	pr LIST{Oid} .
+	
+ 	pr MAP{Int, MemoryMap} * (sort Map{Int, MemoryMap} to Cache{Int, MemoryMap},  op insert to update) .
+ 	
+ 	***op Cache : -> Cid [ctor] .
+	***op CM:_ : Cache{Int, MemoryMap} -> Attribute [ctor] .
+	***op D:_ : stList -> Attribute [ctor] .
+	***op Miss:_ : Int -> Attribute [ctor] .
+	***op Hit:_ : Int -> Attribute [ctor] .
+	***op CacheSz:_ : Int -> Attribute [ctor] .
+	***op Assoc:_ : MapPolicy -> Attribute [ctor] .
+	***op Lflag:_ : Bool -> Attribute [ctor] .
+
+	op <_: CR | Rst:_, Levels:_> :   Oid stList Int -> Object [ctor format(n d d d d d d d d d d n)].
+
+	op <_: Cache | CM:_, D:_, Penalty:_, CacheSz:_, Assoc:_, Lflag:_> : Oid Cache{Int, MemoryMap} stList Int Int MapPolicy Bool -> 
+																Object [ctor format(n d d d d d d d d d d d d d  d d d d d d d d d n)] .
+	
+	op <_: MM | M:_, fetchCount:_, Penalty:_> : Oid MemoryMap Int Int -> Object [ctor format (n d d d d d d d d d d d d d n)] .	       
+      
+endm
+
+view Reference from TRIV to CACHE-DATA-SET is 
+  	sort Elt to Reference .
+ endv
+view stList from TRIV to CACHE-DATA-SET is 
+  	sort Elt to stList .
+ endv
+
+mod REFERENCE-TABLE is 
+	inc CACHE-DATA-SET .
+	pr QID-LIST .
+	pr QID-SET .
+	pr SET{Oid} .
+ 	pr MAP{Reference, Address} * (sort Map{Reference, Address} to Tbl{Reference, Address}) .
+ 	
+    op <_: MP | mp:_> : Oid Int -> Object [ctor format (nb! d d d d d d d n)] .
+ 	***op <_: Log | Data:_> : Oid QidList -> Object [ctor format (nb! d d d d d d d n)] .
+ 	op <_: TBL | Addr:_> : Oid Tbl{Reference, Address} -> Object [ctor format (d d d d d d d d  n)] .		
+ 	op <_: Qu | TidSet:_> : Oid Set{Oid} -> Object [ctor format (nb! d d d d d d d n)] . 
+             
+endm
+
+mod TASK-TABLE is
+   inc REFERENCE-TABLE .
+   pr SET{stList} .
+   
+   pr MAP{Oid, stList} * (sort Map{Oid, stList} to task{Oid, stList}) .
+   
+   op <_: Task | Data:_> : Oid task{Oid, stList} -> Object [ctor format (nb! d d d d d d d n)] .
+   	
+endm
+
+
+
+ 
+  

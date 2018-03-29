@@ -1,0 +1,16 @@
+***load /Users/shiji/PMA/papers/upscale/implementations/maude-new-vers/maude-multilevel-cache/multilevel-local-rules.maude
+load maude-multilevel-cache/multilevel-local-rules.maude
+mod CORE-TEST is 
+
+	ex RULES .
+	ops C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 M Tbl' Sy Ta  Sch'  : -> Oid [ctor] .
+	ops config0 config0#1 config1 config1#1 config2 config2#1 config3 config4 
+	config5 config6 config7 config8 config9 config10 config11 config12 : -> Configuration .
+						         					
+	eq config1 = init((cores# 200, caches# 3) Ref(100, 1) Mem(100) createMain(10, 200)) .	
+	
+	eq config2 = init((cores# 5, caches# 2) Ref(100, 1) Mem(100) createMain2(12, 12)) .
+		
+	
+
+endm

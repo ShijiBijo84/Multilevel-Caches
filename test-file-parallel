@@ -1,0 +1,80 @@
+
+*********Search all possible final states********
+
+1. search {config2} =>* {C:Configuration} .
+
+2. Check for coherency
+--------------------------------------------------
+
+ search {config2} =>* {C:Configuration
+< A:Oid : Cache | CM: (x:Int |-> (y:Address |-> stA:Status), CaA:Cache{Int,MemoryMap}), Atts:AttributeSet >
+< B:Oid : Cache | CM: (x1:Int |-> (y:Address |-> stB:Status), CaB:Cache{Int,MemoryMap}), Atts':AttributeSet >
+ < O:Oid : MM | M: (y:Address |-> stM:Status, D:MemoryMap),fetchCount: N:Int >
+ }   
+ such that ((stM:Status == sh) and (stA:Status == mo)) or 
+ 		   ((stA:Status == mo) and (stB:Status == mo)) or 
+ 		   ((stA:Status == mo) and (stB:Status == sh))  .
+ 		    
+3. No deadlock or livelock which result in suspending tasks forever. 
+---------------------------------------------------------------------------------
+
+search {config2} =>! {C:Configuration 
+< A:Oid : CR | Rst: rstA:stList, Levels: lev:Int >
+ }   
+ such that (rstA:stList =/= nil) .
+
+ 4. At the end of task execution main memory is shared.
+ -----------------------------------------------------------
+ search {config2} =>! {C:Configuration 
+< O:Oid : MM | M: (x:Address |-> stM:Status, D:MemoryMap),fetchCount: N:Int >
+ }   such that (stM:Status == inv) .
+ 
+ 
+crl [commit-All2] :        
+	  			
+	  			        < Lev(i, C1) : Cache | CM: LC1, D: (flush ; d), Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: flag >
+	  					< Lev(j, C1) : Cache | CM: LC2, D: d', Penalty:  p', CacheSz: size', Assoc: mapPol', Lflag: flag' >
+	  					< Me' : MM | M: mapSet, fetchCount: x >
+	  					=>
+	  					< Me' : MM | M: commitMemory(LC1, mapSet), fetchCount: x >
+	  					< Lev(i, C1) : Cache | CM: commitCache(LC1, mapPol, size), D: d, Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: flag >
+	  					< Lev(j, C1) : Cache | CM: LC2, D: (d' ; flush), Penalty:  p', CacheSz: size', Assoc: mapPol', Lflag: flag' > 
+	  					if j == i + 1 .             
+	
+ rl [commit-All3-LC] : 
+	  
+	        			 < Clev : Cache | CM: LC1,  D: (flush ; d), Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: true >
+	        			 < Me' : MM | M: mapSet, fetchCount: x >
+	  					 =>
+	  					 < Me' : MM | M: commitMemory(LC1, mapSet), fetchCount: x >
+	  					 < Clev : Cache | CM: commitCache(LC1, mapPol, size), D: d, Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: true >  .	  	        
+	            	   
+crl [LC-Hit] :
+	            
+< Lev(i, C1) : Cache | CM: LC1, D: (fetch(N) ; d), Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: flag >
+< Lev(j, C1) : Cache | CM: LC2, D: d', Penalty:  p', CacheSz: size', Assoc: mapPol', Lflag: flag' >
+***< Mp(C1) : MP | mp: k >
+=> 
+***< Mp(C1) : MP | mp: (k + p) >
+< Lev(i, C1) : Cache | CM: SwapLines1(LC1, N, selectStatus(LC2, N), size, mapPol), D: d, Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: flag >
+< Lev(j, C1) : Cache | CM: SwapLines2(LC1, remove(LC2, N), N, size, size', mapPol, mapPol'), D: d', Penalty:  p', 
+						CacheSz: size', Assoc: mapPol', Lflag: flag' > if validStatus(LC2, N) and j == i + 1 .
+						
+crl [Fetch2] : 
+					< Clev : Cache | CM: LC1,  D: (Block(N) ; d), Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: true >
+	          		< Me' : MM | M: mapSet, fetchCount: x' >
+	          		=>
+	          		< Me' : MM | M: mapSet, fetchCount: x' >
+	          		< Clev : Cache | CM: LC1,  D: (flush(LineToFlush(cacheLineSet(LC1, mapPol, size, N), mo, mapPol)) ; Block(N) ; d),  
+	          		 Penalty:  p, CacheSz: size, Assoc: mapPol, Lflag: true > 
+	          		 if allModified(cacheLineSet(LC1,  mapPol, size, N), mapPol) == true  .								
+
+crl [Fetch2] : 
+					< Clev : Cache | CM: (LC1, x |-> M),  D: (Block(N) ; d), Penalty:  p, CacheSz: size, Assoc: Assoc(i), Lflag: true >
+	          		< Me' : MM | M: mapSet, fetchCount: x' >
+	          		=>
+	          		< Me' : MM | M: mapSet, fetchCount: x' >
+	          		< Clev : Cache | CM: (LC1, x |-> M),  D: (flush(LineToFlush()) ; Block(N) ; d),  
+	          		 Penalty:  p, CacheSz: size, Assoc: Assoc(i), Lflag: true > 
+	          		 if allModified(M, i) == true and (N rem (size quo i)) == x .
+ 

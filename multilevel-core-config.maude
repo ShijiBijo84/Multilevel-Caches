@@ -1,0 +1,94 @@
+---operator ? for choice operator. 
+
+
+ mod CORE-CONFIG is 
+    inc  CONFIGURATION .
+    pr INT .
+    pr QID .
+    
+    
+    sorts GlobalSystem OidSet Instruction Status MapPolicy Reference Address  .
+    sorts  Cores Clevels CoreTuple .                         
+	subsort Oid < OidSet .
+	subsort  Int < Address .
+	
+	
+    op {_} : Configuration -> GlobalSystem [ctor] .
+	op none : -> OidSet [ctor] .
+	op _;_ : OidSet OidSet -> OidSet [ctor assoc comm id: none] .
+	op broadcast_from_ : Instruction Oid -> Configuration .
+	op multicast_from_to_ : Instruction Oid OidSet -> Msg [ctor] .
+	op msg_from_to_ : Instruction Oid Oid -> Msg [ctor] .
+	op _from_ : Instruction Oid -> Instruction [ctor] .
+	op objectIds : Configuration -> OidSet [frozen(1)] . 
+    ops sh mo inv unknown :  -> Status [ctor] .
+    op Assoc : Int -> MapPolicy [ctor] . 	
+       
+    op ref : Int -> Reference [ctor] .	
+    
+    op C#_ : Int -> Oid . 
+    op cores#_ : Int -> Cores .
+    op caches#_ : Int -> Clevels . 
+    op _,_ : Cores Clevels -> CoreTuple .
+    
+    op T#_ : Int -> Oid . 
+    
+    op Tbl : -> Oid .
+    op Tas : -> Oid .
+    op Memory : -> Oid .
+    
+    op Log : Oid -> Oid .
+    op Lev : Int Oid -> Oid .
+    op Mp : Oid -> Oid .
+    
+    	     
+endm
+
+view Instruction from TRIV to CORE-CONFIG is
+	sort Elt to Instruction .
+endv
+
+view Status from TRIV to CORE-CONFIG is
+	sort Elt to Status .
+endv
+
+view Oid from TRIV to CORE-CONFIG is 
+	sort Elt to Oid .
+endv
+view Address from TRIV to CORE-CONFIG is 
+	sort Elt to Address .
+endv
+
+view CoreTuple from TRIV to CORE-CONFIG is 
+	sort Elt to CoreTuple .
+endv
+
+
+mod CORE-INTERFACE{K :: TRIV, V :: TRIV} is
+	ex CORE-CONFIG .    
+	pr (LIST{Instruction} * (sort List{Instruction} to stList, op __ : List{Instruction} List{Instruction} -> List{Instruction} 
+															to (_;_) [prec 121 format (d r os d)])) .
+	
+	pr (MAP{Address, Status} * (sort Entry{Address, Status} to EntrySet{Address, Status}, op empty to free,  
+       op _,_ : Map{Address, Status} Map{Address, Status} -> Map{Address, Status} to (__))) .														
+	op fetch : K$Elt -> Instruction [ctor] .
+	op flush : K$Elt -> Instruction [ctor] .
+	op flush : -> Instruction [ctor] .
+	op read : K$Elt -> Instruction [ctor] .
+	op write : K$Elt -> Instruction [ctor] .
+	op readBl : K$Elt -> Instruction [ctor] .
+	op writeBl : K$Elt -> Instruction [ctor] .
+	op RdX : K$Elt -> Instruction [ctor] .
+	op Rd : K$Elt -> Instruction [ctor] .
+	op fetchBl : K$Elt -> Instruction [ctor] .
+	
+	op commit : -> Instruction [ctor] .
+	op commit : K$Elt -> Instruction [ctor] .
+	
+	op Spawn : Oid -> Instruction [ctor] .
+	op Skip : -> Instruction [ctor] .
+	op _* : stList -> Instruction[ctor] .
+	op _*_ : stList Int -> Instruction[ctor] .
+    op _?_  : stList stList -> Instruction [ctor comm] .
+
+endm

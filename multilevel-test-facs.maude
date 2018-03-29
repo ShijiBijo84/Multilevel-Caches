@@ -1,0 +1,628 @@
+load /Users/shiji/PMA/papers/upscale/implementations/maude-new-vers/maude-multilevel-cache/multilevel-local-rules.maude
+
+mod CORE-TEST is 
+
+	ex RULES .
+	ops C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 M Tbl' Sy Ta  Sch'  : -> Oid [ctor] .
+	ops config0 config0#1 config1 config1#1 config2 config2#1 config3 config4 
+	config5 config6 config7 config8 config9 config10 config11 config12 : -> Configuration .
+	
+
+eq config0 = < Tbl : TBL | Addr: ref(0)|-> 0, ref(1)|-> 1, ref(2)|-> 2, ref(3)|-> 3, ref(4)|-> 4, ref(5)|-> 5, 
+			 ref(6)|-> 6, ref(7)|-> 7, ref(8)|-> 8, ref(9)|-> 9, ref(10)|-> 10, ref(11)|-> 11, ref(12)|-> 12, ref(13)|-> 13, ref(14)|-> 14, 
+			 ref(15)|-> 15, ref(16)|-> 16, ref(17)|-> 17,  ref(18)|-> 18, ref(19)|-> 19, ref(20)|-> 20, ref(21)|-> 21, ref(22)|-> 22, 
+			 ref(23)|-> 23, ref(24)|-> 24, ref(25)|-> 25, ref(26)|-> 26, ref(27)|-> 27, ref(28)|-> 28, ref(29)|-> 29, ref(30)|-> 30,
+			 ref(31)|-> 31, ref(32)|-> 32, ref(33)|-> 33, ref(34)|-> 34, ref(35)|-> 35, ref(36)|-> 36, ref(37)|-> 37, ref(38)|-> 38,  
+			 ref(39)|-> 39, ref(40)|-> 40, ref(41)|-> 41, ref(42)|-> 42, ref(43)|-> 43, ref(44)|-> 44, ref(45)|-> 45, ref(46)|-> 46, 
+			 ref(47)|-> 47, ref(48)|-> 48, ref(49)|-> 49, ref(50)|-> 50, ref(51)|-> 51, ref(52)|-> 52, ref(53)|-> 53, ref(54)|-> 54, 
+			 ref(55)|-> 55, ref(56)|-> 56, ref(57)|-> 57, ref(58)|-> 58, ref(59)|-> 59, ref(60)|-> 60, ref(61)|-> 61, ref(62)|-> 62, 
+			 ref(63)|-> 63, ref(64)|-> 64, ref(65)|-> 65, ref(66)|-> 66, ref(67)|-> 67, ref(68)|-> 68, ref(69)|-> 69, ref(70)|-> 70,
+			 ref(71)|-> 71, ref(72)|-> 72, ref(73)|-> 73, ref(74)|-> 74, ref(75)|-> 75, ref(76)|-> 76, ref(77)|-> 77, ref(78)|-> 78, 
+			 ref(79)|-> 79, ref(80)|-> 80, ref(81)|-> 81, ref(82)|-> 82, ref(83)|-> 83, ref(84)|-> 84, 
+			 ref(85)|-> 85, ref(86)|-> 86, ref(87)|-> 87, ref(88)|-> 88, ref(89)|-> 89 > 
+             < Ta : Task | Data: T #0 |-> (Spawn('T1) ; Spawn('T2) ; Spawn('T3)),
+             					 'T1 |-> (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29)
+             					          ) * 20,
+             					          
+             					 'T2 |-> (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59)) * 20, 
+             					 		  
+             					 		   
+             					          
+								 'T3 |-> (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89)
+             					          ) * 20 >
+             					          
+			 < C1 : CR | Rst: (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29)
+             					          ) * 20, Levels: 1 >	
+             < Lev(1, C1) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: true >	
+             < C2 : CR | Rst: (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59)) * 20, Levels: 2 >
+             < Lev(1, C2) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C2) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: true >	            	
+             < C3 : CR | Rst: (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89)
+             					          ) * 20, Levels: 3 >	
+             < Lev(1, C3) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C3) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >
+             < Lev(3, C3) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             ***< Sch : Qu | TidSet: 'main > 
+             < Mp(C1) : MP | mp: 0 >
+             < Mp(C2) : MP | mp: 0 >
+             < Mp(C3) : MP | mp: 0 >
+             < M : MM | M: 0 |-> sh, 1 |-> sh, 2 |-> sh, 3 |-> sh, 4 |-> sh, 5 |-> sh, 6 |-> sh, 7 |-> sh, 
+             8 |-> sh, 9 |-> sh, 10 |-> sh, 11 |-> sh, 12 |-> sh, 13 |-> sh, 14 |-> sh, 15 |-> sh, 16 |-> sh, 17 |-> sh, 
+             18 |-> sh, 19 |-> sh, 20 |-> sh, 21 |-> sh, 22 |-> sh, 23 |-> sh, 24 |-> sh, 25 |-> sh, 26 |-> sh, 27 |-> sh, 28 |-> sh,
+             29 |-> sh, 30 |-> sh, 31 |-> sh, 32 |-> sh, 33 |-> sh, 34 |-> sh, 35 |-> sh, 36 |-> sh, 37 |-> sh, 38 |-> sh, 
+             39 |-> sh, 40 |-> sh, 41 |-> sh, 42 |-> sh, 43 |-> sh, 44 |-> sh, 45 |-> sh, 46 |-> sh, 47 |-> sh, 48 |-> sh, 49 |-> sh,
+             50 |-> sh, 51 |-> sh, 52 |-> sh, 53 |-> sh, 54 |-> sh, 55 |-> sh, 56 |-> sh, 57 |-> sh, 58 |-> sh, 59 |-> sh,
+             60 |-> sh, 61 |-> sh, 62 |-> sh, 63 |-> sh, 64 |-> sh, 65 |-> sh, 66 |-> sh, 67 |-> sh, 68 |-> sh, 69 |-> sh, 70 |-> sh,
+             71 |-> sh, 72 |-> sh, 73 |-> sh, 74 |-> sh, 75 |-> sh, 76 |-> sh, 77 |-> sh, 78 |-> sh, 79 |-> sh, 80 |-> sh, 81 |-> sh, 
+             82 |-> sh, 83 |-> sh, 84 |-> sh, 85 |-> sh, 86 |-> sh, 87 |-> sh, 88 |-> sh, 89 |-> sh, fetchCount: 0 > . 
+             
+             
+ eq config1 = < Tbl : TBL | Addr: ref(0)|-> 0, ref(5)|-> 0, 
+ 								   ref(1)|-> 1, ref(6)|-> 1, 
+ 								   ref(2)|-> 2, ref(7)|-> 2, 
+ 								   ref(3)|-> 3, ref(8)|-> 3, 
+ 								   ref(4)|-> 4, ref(9)|-> 4, 
+ 								   ref(10)|-> 5, ref(15)|-> 5, 
+ 								   ref(11)|-> 6, ref(16)|-> 6, 
+ 								   ref(12)|-> 7, ref(17)|-> 7, 
+ 								   ref(13)|-> 8, ref(18)|-> 8, 
+ 								   ref(14)|-> 9, ref(19)|-> 9, 
+ 								   ref(20)|-> 10, ref(25)|-> 10, 
+ 								   ref(21)|-> 11, ref(26)|-> 11,
+ 								   ref(22)|-> 12, ref(27)|-> 12, 
+ 								   ref(23)|-> 13, ref(28)|-> 13, 
+ 								   ref(24)|-> 14, ref(29)|-> 14,
+ 								   ref(30)|-> 15, ref(35)|-> 15, 
+ 								   ref(31)|-> 16, ref(36)|-> 16, 
+ 								   ref(32)|-> 17, ref(37)|-> 17,
+ 								   ref(33)|-> 18, ref(38)|-> 18, 
+ 								   ref(34)|-> 19, ref(39)|-> 19, 
+ 								   ref(40)|-> 20, ref(45)|-> 20,
+ 								   ref(41)|-> 21, ref(46)|-> 21,
+ 								   ref(42)|-> 22, ref(47)|-> 22, 
+ 								   ref(43)|-> 23, ref(48)|-> 23,
+ 								   ref(44)|-> 24, ref(49)|-> 24,
+ 								   ref(50)|-> 25, ref(55)|-> 25, 
+ 								   ref(51)|-> 26, ref(56)|-> 26,
+ 								   ref(52)|-> 27, ref(57)|-> 27,
+ 								   ref(53)|-> 28, ref(58)|-> 28, 
+ 								   ref(54)|-> 29, ref(59)|-> 29,
+ 								   ref(60)|-> 30, ref(65)|-> 30, 
+ 								   ref(61)|-> 31, ref(66)|-> 31,
+ 								   ref(62)|-> 32, ref(67)|-> 32,
+ 								   ref(63)|-> 33, ref(68)|-> 33, 
+ 								   ref(64)|-> 34, ref(69)|-> 34,
+ 								   ref(70)|-> 35, ref(75)|-> 35, 
+ 								   ref(71)|-> 36, ref(76)|-> 36,
+ 								   ref(72)|-> 37, ref(77)|-> 37,
+ 								   ref(73)|-> 38, ref(78)|-> 38, 
+ 								   ref(74)|-> 39, ref(79)|-> 39, 
+ 								   ref(80)|-> 40, ref(85)|-> 40, 
+ 								   ref(81)|-> 41, ref(86)|-> 41,
+ 								   ref(82)|-> 42, ref(87)|-> 42,
+ 								   ref(83)|-> 43, ref(88)|-> 43, 
+ 								   ref(84)|-> 44, ref(89)|-> 44 > 
+             < Ta : Task | Data: 'main |-> (Spawn('T1) ; Spawn('T2) ; Spawn('T3)),
+             					 'T1 |-> (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29)
+             					          ) * 20,
+             					          
+             					 'T2 |-> (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59)) * 20, 
+             					 		              					          
+								 'T3 |-> (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89)
+             					          ) * 20 >
+             					          
+			 < C1 : CR | Rst: (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29)
+             					          ) * 20, Levels: 1 >	
+             < Lev(1, C1) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: true >	
+             < C2 : CR | Rst: (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59)) * 20, Levels: 2 >
+             < Lev(1, C2) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C2) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: true >	            	
+             < C3 : CR | Rst: (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89)
+             					          ) * 20,  Levels: 3 >           					         	
+             < Lev(1, C3) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C3) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >
+             < Lev(3, C3) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             ***< Sch : Qu | TidSet: 'main > 
+             < Mp(C1) : MP | mp: 0 >
+             < Mp(C2) : MP | mp: 0 >
+             < Mp(C3) : MP | mp: 0 >
+             < M : MM | M: 0 |-> sh, 1 |-> sh, 2 |-> sh, 3 |-> sh, 4 |-> sh, 5 |-> sh, 6 |-> sh, 7 |-> sh, 
+             8 |-> sh, 9 |-> sh, 10 |-> sh, 11 |-> sh, 12 |-> sh, 13 |-> sh, 14 |-> sh, 15 |-> sh, 16 |-> sh, 17 |-> sh, 
+             18 |-> sh, 19 |-> sh, 20 |-> sh, 21 |-> sh, 22 |-> sh, 23 |-> sh, 24 |-> sh, 25 |-> sh, 26 |-> sh, 27 |-> sh, 28 |-> sh,
+             29 |-> sh, 30 |-> sh, 31 |-> sh, 32 |-> sh, 33 |-> sh, 34 |-> sh, 35 |-> sh, 36 |-> sh, 37 |-> sh, 38 |-> sh, 
+             39 |-> sh, 40 |-> sh, 41 |-> sh, 42 |-> sh, 43 |-> sh, 44 |-> sh, 45 |-> sh, 46 |-> sh, 47 |-> sh, 48 |-> sh, 49 |-> sh,
+             50 |-> sh, 51 |-> sh, 52 |-> sh, 53 |-> sh, 54 |-> sh, 55 |-> sh, 56 |-> sh, 57 |-> sh, 58 |-> sh, 59 |-> sh,
+             60 |-> sh, 61 |-> sh, 62 |-> sh, 63 |-> sh, 64 |-> sh, 65 |-> sh, 66 |-> sh, 67 |-> sh, 68 |-> sh, 69 |-> sh, 70 |-> sh,
+             71 |-> sh, 72 |-> sh, 73 |-> sh, 74 |-> sh, 75 |-> sh, 76 |-> sh, 77 |-> sh, 78 |-> sh, 79 |-> sh, 80 |-> sh, 81 |-> sh, 
+             82 |-> sh, 83 |-> sh, 84 |-> sh, 85 |-> sh, 86 |-> sh, 87 |-> sh, 88 |-> sh, 89 |-> sh, fetchCount: 0 > .  
+             
+             
+     eq config2 = < Tbl : TBL | Addr: ref(0)|-> 0, ref(5)|-> 0, ref(10)|-> 0,
+ 								   ref(1)|-> 1, ref(6)|-> 1, ref(11)|-> 1,
+ 								   ref(2)|-> 2, ref(7)|-> 2, ref(12)|-> 2,
+ 								   ref(3)|-> 3, ref(8)|-> 3, ref(13)|-> 3,
+ 								   ref(4)|-> 4, ref(9)|-> 4, ref(14)|-> 4,
+ 								   ref(15)|-> 5, ref(20)|-> 5, ref(25)|-> 5,
+ 								   ref(16)|-> 6, ref(21)|-> 6, ref(26)|-> 6,
+ 								   ref(17)|-> 7, ref(22)|-> 7, ref(27)|-> 7,
+ 								   ref(18)|-> 8, ref(23)|-> 8, ref(28)|-> 8,
+ 								   ref(19)|-> 9, ref(24)|-> 9, ref(29)|-> 9, 							
+ 								   ref(30)|-> 10, ref(35)|-> 10, ref(40)|-> 10,
+ 								   ref(31)|-> 11, ref(36)|-> 11, ref(41)|-> 11,
+ 								   ref(32)|-> 12, ref(37)|-> 12, ref(42)|-> 12,
+ 								   ref(33)|-> 13, ref(38)|-> 13, ref(43)|-> 13,
+ 								   ref(34)|-> 14, ref(39)|-> 14, ref(44)|-> 14,
+ 								   ref(45)|-> 15, ref(50)|-> 15, ref(55)|-> 15,
+ 								   ref(46)|-> 16, ref(51)|-> 16, ref(56)|-> 16,
+ 								   ref(47)|-> 17, ref(52)|-> 17, ref(57)|-> 17,
+ 								   ref(48)|-> 18, ref(53)|-> 18, ref(58)|-> 18,
+ 								   ref(49)|-> 19, ref(54)|-> 19, ref(59)|-> 19,
+ 					 		       ref(60)|-> 20, ref(65)|-> 20, ref(70)|-> 20,
+ 								   ref(61)|-> 21, ref(66)|-> 21, ref(71)|-> 21,
+ 								   ref(62)|-> 22, ref(67)|-> 22, ref(72)|-> 22,
+ 								   ref(63)|-> 23, ref(68)|-> 23, ref(73)|-> 23,
+ 								   ref(64)|-> 24, ref(69)|-> 24, ref(74)|-> 24,
+ 								   ref(75)|-> 25, ref(80)|-> 25, ref(85)|-> 25,
+ 								   ref(76)|-> 26, ref(81)|-> 26, ref(86)|-> 26,
+ 								   ref(77)|-> 27, ref(82)|-> 27, ref(87)|-> 27,
+ 								   ref(78)|-> 28, ref(83)|-> 28, ref(88)|-> 28,
+ 								   ref(79)|-> 29, ref(84)|-> 29, ref(89)|-> 29 >
+       < Ta : Task | Data: 'main |-> (Spawn('T1) ; Spawn('T2) ; Spawn('T3)),
+             					 'T1 |-> (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29)
+             					          ) * 20,
+             					          
+             					 'T2 |-> (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59)) * 20, 
+             					 		              					          
+								 'T3 |-> (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89)
+             					          ) * 20 >
+             					          
+			 < C1 : CR | Rst: (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29)
+             					          ) * 20, Levels: 1 >	
+             < Lev(1, C1) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: true >	
+             < C2 : CR | Rst: (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59)) * 20, Levels: 2 >
+             < Lev(1, C2) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C2) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: true >	            	
+             < C3 : CR | Rst: (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89)
+             					          ) * 20,  Levels: 3 >           					         	
+             < Lev(1, C3) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C3) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >
+             < Lev(3, C3) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             ***< Sch : Qu | TidSet: 'main > 
+             < Mp(C1) : MP | mp: 0 >
+             < Mp(C2) : MP | mp: 0 >
+             < Mp(C3) : MP | mp: 0 >
+             < M : MM | M: 0 |-> sh, 1 |-> sh, 2 |-> sh, 3 |-> sh, 4 |-> sh, 5 |-> sh, 6 |-> sh, 7 |-> sh, 
+             8 |-> sh, 9 |-> sh, 10 |-> sh, 11 |-> sh, 12 |-> sh, 13 |-> sh, 14 |-> sh, 15 |-> sh, 16 |-> sh, 17 |-> sh, 
+             18 |-> sh, 19 |-> sh, 20 |-> sh, 21 |-> sh, 22 |-> sh, 23 |-> sh, 24 |-> sh, 25 |-> sh, 26 |-> sh, 27 |-> sh, 28 |-> sh,
+             29 |-> sh, 30 |-> sh, 31 |-> sh, 32 |-> sh, 33 |-> sh, 34 |-> sh, 35 |-> sh, 36 |-> sh, 37 |-> sh, 38 |-> sh, 
+             39 |-> sh, 40 |-> sh, 41 |-> sh, 42 |-> sh, 43 |-> sh, 44 |-> sh, 45 |-> sh, 46 |-> sh, 47 |-> sh, 48 |-> sh, 49 |-> sh,
+             50 |-> sh, 51 |-> sh, 52 |-> sh, 53 |-> sh, 54 |-> sh, 55 |-> sh, 56 |-> sh, 57 |-> sh, 58 |-> sh, 59 |-> sh,
+             60 |-> sh, 61 |-> sh, 62 |-> sh, 63 |-> sh, 64 |-> sh, 65 |-> sh, 66 |-> sh, 67 |-> sh, 68 |-> sh, 69 |-> sh, 70 |-> sh,
+             71 |-> sh, 72 |-> sh, 73 |-> sh, 74 |-> sh, 75 |-> sh, 76 |-> sh, 77 |-> sh, 78 |-> sh, 79 |-> sh, 80 |-> sh, 81 |-> sh, 
+             82 |-> sh, 83 |-> sh, 84 |-> sh, 85 |-> sh, 86 |-> sh, 87 |-> sh, 88 |-> sh, 89 |-> sh, fetchCount: 0 > .   
+             
+     eq config3 = < Tbl : TBL | Addr: ref(0)|-> 0, ref(1)|-> 1, ref(2)|-> 2, ref(3)|-> 3, ref(4)|-> 4, ref(5)|-> 5, 
+			 ref(6)|-> 6, ref(7)|-> 7, ref(8)|-> 8, ref(9)|-> 9, ref(10)|-> 10, ref(11)|-> 11, ref(12)|-> 12, ref(13)|-> 13, ref(14)|-> 14, 
+			 ref(15)|-> 15, ref(16)|-> 16, ref(17)|-> 17,  ref(18)|-> 18, ref(19)|-> 19, ref(20)|-> 20, ref(21)|-> 21, ref(22)|-> 22, 
+			 ref(23)|-> 23, ref(24)|-> 24, ref(25)|-> 25, ref(26)|-> 26, ref(27)|-> 27, ref(28)|-> 28, ref(29)|-> 29, ref(30)|-> 30,
+			 ref(31)|-> 31, ref(32)|-> 32, ref(33)|-> 33, ref(34)|-> 34, ref(35)|-> 35, ref(36)|-> 36, ref(37)|-> 37, ref(38)|-> 38,  
+			 ref(39)|-> 39, ref(40)|-> 40, ref(41)|-> 41, ref(42)|-> 42, ref(43)|-> 43, ref(44)|-> 44, ref(45)|-> 45, ref(46)|-> 46, 
+			 ref(47)|-> 47, ref(48)|-> 48, ref(49)|-> 49, ref(50)|-> 50, ref(51)|-> 51, ref(52)|-> 52, ref(53)|-> 53, ref(54)|-> 54, 
+			 ref(55)|-> 55, ref(56)|-> 56, ref(57)|-> 57, ref(58)|-> 58, ref(59)|-> 59, ref(60)|-> 60, ref(61)|-> 61, ref(62)|-> 62, 
+			 ref(63)|-> 63, ref(64)|-> 64, ref(65)|-> 65, ref(66)|-> 66, ref(67)|-> 67, ref(68)|-> 68, ref(69)|-> 69, ref(70)|-> 70,
+			 ref(71)|-> 71, ref(72)|-> 72, ref(73)|-> 73, ref(74)|-> 74, ref(75)|-> 75, ref(76)|-> 76, ref(77)|-> 77, ref(78)|-> 78, 
+			 ref(79)|-> 79, ref(80)|-> 80, ref(81)|-> 81, ref(82)|-> 82, ref(83)|-> 83, ref(84)|-> 84, 
+			 ref(85)|-> 85, ref(86)|-> 86, ref(87)|-> 87, ref(88)|-> 88, ref(89)|-> 89 > 
+             < Ta : Task | Data: 'main |-> (Spawn('T1) ; Spawn('T2) ; Spawn('T3)),
+             					 'T1 |-> (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29) ;
+             					          read(30) ; write(85) ; read(30) ; write(40) ; read(30) ; write(40) ;
+             					          write(8) ; read(3) ; write(8) ; read(3) ; write(28) ; write(23) 
+             					          ) * 20,
+             					          
+             					 'T2 |-> (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59) ;
+             					 		  read(33) ; write(38) ; read(33) ; write(38) ; write(53) ; read(58) ; 
+             					 		  read(11) ; write(16) ; read(11) ; write(16) ; write(21) ; write(26) ;
+             					 		  read(71) ; read(66) ; write(61) ; write(16)
+             					 		  ) * 20, 
+             					 		  
+             					 		   
+             					          
+								 'T3 |-> (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89) ;
+             					          write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(67) ; read(62) ; read(67) ; read(62) ; read(77) ; read(82) ;
+             					          read(63) ; read(47) ; read(63) ; write(87)
+             					          ) * 20 >
+             					          
+			 < C1 : CR | Rst: (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29) ;
+             					          read(30) ; write(85) ; read(30) ; write(40) ; read(30) ; write(40) ;
+             					          write(8) ; read(3) ; write(8) ; read(3) ; write(28) ; write(23) 
+             					          ) * 20, Levels: 1 >	
+             < Lev(1, C1) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >
+             < Lev(2, C1) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >
+             < Lev(3, C1) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >
+             	
+             < C2 : CR | Rst: (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59) ;
+             					 		  read(33) ; write(38) ; read(33) ; write(38) ; write(53) ; read(58) ; 
+             					 		  read(11) ; write(16) ; read(11) ; write(16) ; write(21) ; write(26) ;
+             					 		  read(71) ; read(66) ; write(61) ; write(16)
+             					 		  ) * 20, Levels: 2 >
+             < Lev(1, C2) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C2) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >	
+             < Lev(3, C2) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             	            	
+             < C3 : CR | Rst: (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89) ;
+             					          write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(67) ; read(62) ; read(67) ; read(62) ; read(77) ; read(82) ;
+             					          read(63) ; read(47) ; read(63) ; write(87)
+             					          ) * 20 , Levels: 3 >	
+             < Lev(1, C3) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C3) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >	
+             < Lev(3, C3) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             	
+             ***< Sch : Qu | TidSet: 'main > 
+             < Mp(C1) : MP | mp: 0 >
+             < Mp(C2) : MP | mp: 0 >
+             < Mp(C3) : MP | mp: 0 >
+             < M : MM | M: 0 |-> sh, 1 |-> sh, 2 |-> sh, 3 |-> sh, 4 |-> sh, 5 |-> sh, 6 |-> sh, 7 |-> sh, 
+             8 |-> sh, 9 |-> sh, 10 |-> sh, 11 |-> sh, 12 |-> sh, 13 |-> sh, 14 |-> sh, 15 |-> sh, 16 |-> sh, 17 |-> sh, 
+             18 |-> sh, 19 |-> sh, 20 |-> sh, 21 |-> sh, 22 |-> sh, 23 |-> sh, 24 |-> sh, 25 |-> sh, 26 |-> sh, 27 |-> sh, 28 |-> sh,
+             29 |-> sh, 30 |-> sh, 31 |-> sh, 32 |-> sh, 33 |-> sh, 34 |-> sh, 35 |-> sh, 36 |-> sh, 37 |-> sh, 38 |-> sh, 
+             39 |-> sh, 40 |-> sh, 41 |-> sh, 42 |-> sh, 43 |-> sh, 44 |-> sh, 45 |-> sh, 46 |-> sh, 47 |-> sh, 48 |-> sh, 49 |-> sh,
+             50 |-> sh, 51 |-> sh, 52 |-> sh, 53 |-> sh, 54 |-> sh, 55 |-> sh, 56 |-> sh, 57 |-> sh, 58 |-> sh, 59 |-> sh,
+             60 |-> sh, 61 |-> sh, 62 |-> sh, 63 |-> sh, 64 |-> sh, 65 |-> sh, 66 |-> sh, 67 |-> sh, 68 |-> sh, 69 |-> sh, 70 |-> sh,
+             71 |-> sh, 72 |-> sh, 73 |-> sh, 74 |-> sh, 75 |-> sh, 76 |-> sh, 77 |-> sh, 78 |-> sh, 79 |-> sh, 80 |-> sh, 81 |-> sh, 
+             82 |-> sh, 83 |-> sh, 84 |-> sh, 85 |-> sh, 86 |-> sh, 87 |-> sh, 88 |-> sh, 89 |-> sh, fetchCount: 0 > . 
+      
+
+eq config4 =  < Tbl : TBL | Addr: ref(0)|-> 0, ref(5)|-> 0, 
+ 								   ref(1)|-> 1, ref(6)|-> 1, 
+ 								   ref(2)|-> 2, ref(7)|-> 2, 
+ 								   ref(3)|-> 3, ref(8)|-> 3, 
+ 								   ref(4)|-> 4, ref(9)|-> 4, 
+ 								   ref(10)|-> 5, ref(15)|-> 5, 
+ 								   ref(11)|-> 6, ref(16)|-> 6, 
+ 								   ref(12)|-> 7, ref(17)|-> 7, 
+ 								   ref(13)|-> 8, ref(18)|-> 8, 
+ 								   ref(14)|-> 9, ref(19)|-> 9, 
+ 								   ref(20)|-> 10, ref(25)|-> 10, 
+ 								   ref(21)|-> 11, ref(26)|-> 11,
+ 								   ref(22)|-> 12, ref(27)|-> 12, 
+ 								   ref(23)|-> 13, ref(28)|-> 13, 
+ 								   ref(24)|-> 14, ref(29)|-> 14,
+ 								   ref(30)|-> 15, ref(35)|-> 15, 
+ 								   ref(31)|-> 16, ref(36)|-> 16, 
+ 								   ref(32)|-> 17, ref(37)|-> 17,
+ 								   ref(33)|-> 18, ref(38)|-> 18, 
+ 								   ref(34)|-> 19, ref(39)|-> 19, 
+ 								   ref(40)|-> 20, ref(45)|-> 20,
+ 								   ref(41)|-> 21, ref(46)|-> 21,
+ 								   ref(42)|-> 22, ref(47)|-> 22, 
+ 								   ref(43)|-> 23, ref(48)|-> 23,
+ 								   ref(44)|-> 24, ref(49)|-> 24,
+ 								   ref(50)|-> 25, ref(55)|-> 25, 
+ 								   ref(51)|-> 26, ref(56)|-> 26,
+ 								   ref(52)|-> 27, ref(57)|-> 27,
+ 								   ref(53)|-> 28, ref(58)|-> 28, 
+ 								   ref(54)|-> 29, ref(59)|-> 29,
+ 								   ref(60)|-> 30, ref(65)|-> 30, 
+ 								   ref(61)|-> 31, ref(66)|-> 31,
+ 								   ref(62)|-> 32, ref(67)|-> 32,
+ 								   ref(63)|-> 33, ref(68)|-> 33, 
+ 								   ref(64)|-> 34, ref(69)|-> 34,
+ 								   ref(70)|-> 35, ref(75)|-> 35, 
+ 								   ref(71)|-> 36, ref(76)|-> 36,
+ 								   ref(72)|-> 37, ref(77)|-> 37,
+ 								   ref(73)|-> 38, ref(78)|-> 38, 
+ 								   ref(74)|-> 39, ref(79)|-> 39, 
+ 								   ref(80)|-> 40, ref(85)|-> 40, 
+ 								   ref(81)|-> 41, ref(86)|-> 41,
+ 								   ref(82)|-> 42, ref(87)|-> 42,
+ 								   ref(83)|-> 43, ref(88)|-> 43, 
+ 								   ref(84)|-> 44, ref(89)|-> 44 >  
+             < Ta : Task | Data: 'main |-> (Spawn('T1) ; Spawn('T2) ; Spawn('T3)),
+             					 'T1 |-> (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29) ;
+             					          read(30) ; write(85) ; read(30) ; write(40) ; read(30) ; write(40) ;
+             					          write(8) ; read(3) ; write(8) ; read(3) ; write(28) ; write(23) 
+             					          ) * 20,
+             					          
+             					 'T2 |-> (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59) ;
+             					 		  read(33) ; write(38) ; read(33) ; write(38) ; write(53) ; read(58) ; 
+             					 		  read(11) ; write(16) ; read(11) ; write(16) ; write(21) ; write(26) ;
+             					 		  read(71) ; read(66) ; write(61) ; write(16)
+             					 		  ) * 20, 
+             					 		  
+             					 		   
+             					          
+								 'T3 |-> (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89) ;
+             					          write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(67) ; read(62) ; read(67) ; read(62) ; read(77) ; read(82) ;
+             					          read(63) ; read(47) ; read(63) ; write(87)
+             					          ) * 20 >
+             					          
+			 < C1 : CR | Rst: (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29) ;
+             					          read(30) ; write(85) ; read(30) ; write(40) ; read(30) ; write(40) ;
+             					          write(8) ; read(3) ; write(8) ; read(3) ; write(28) ; write(23) 
+             					          ) * 20, Levels: 1 >	
+             < Lev(1, C1) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >
+             < Lev(2, C1) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >
+             < Lev(3, C1) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >
+             	
+             < C2 : CR | Rst: (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59) ;
+             					 		  read(33) ; write(38) ; read(33) ; write(38) ; write(53) ; read(58) ; 
+             					 		  read(11) ; write(16) ; read(11) ; write(16) ; write(21) ; write(26) ;
+             					 		  read(71) ; read(66) ; write(61) ; write(16)
+             					 		  ) * 20, Levels: 2 >
+             < Lev(1, C2) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C2) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >	
+             < Lev(3, C2) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             	            	
+             < C3 : CR | Rst: (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89) ;
+             					          write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(67) ; read(62) ; read(67) ; read(62) ; read(77) ; read(82) ;
+             					          read(63) ; read(47) ; read(63) ; write(87)
+             					          ) * 20, Levels: 3 >	
+             < Lev(1, C3) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C3) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >	
+             < Lev(3, C3) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             	
+             ***< Sch : Qu | TidSet: 'main > 
+             < Mp(C1) : MP | mp: 0 >
+             < Mp(C2) : MP | mp: 0 >
+             < Mp(C3) : MP | mp: 0 >
+             < M : MM | M: 0 |-> sh, 1 |-> sh, 2 |-> sh, 3 |-> sh, 4 |-> sh, 5 |-> sh, 6 |-> sh, 7 |-> sh, 
+             8 |-> sh, 9 |-> sh, 10 |-> sh, 11 |-> sh, 12 |-> sh, 13 |-> sh, 14 |-> sh, 15 |-> sh, 16 |-> sh, 17 |-> sh, 
+             18 |-> sh, 19 |-> sh, 20 |-> sh, 21 |-> sh, 22 |-> sh, 23 |-> sh, 24 |-> sh, 25 |-> sh, 26 |-> sh, 27 |-> sh, 28 |-> sh,
+             29 |-> sh, 30 |-> sh, 31 |-> sh, 32 |-> sh, 33 |-> sh, 34 |-> sh, 35 |-> sh, 36 |-> sh, 37 |-> sh, 38 |-> sh, 
+             39 |-> sh, 40 |-> sh, 41 |-> sh, 42 |-> sh, 43 |-> sh, 44 |-> sh, 45 |-> sh, 46 |-> sh, 47 |-> sh, 48 |-> sh, 49 |-> sh,
+             50 |-> sh, 51 |-> sh, 52 |-> sh, 53 |-> sh, 54 |-> sh, 55 |-> sh, 56 |-> sh, 57 |-> sh, 58 |-> sh, 59 |-> sh,
+             60 |-> sh, 61 |-> sh, 62 |-> sh, 63 |-> sh, 64 |-> sh, 65 |-> sh, 66 |-> sh, 67 |-> sh, 68 |-> sh, 69 |-> sh, 70 |-> sh,
+             71 |-> sh, 72 |-> sh, 73 |-> sh, 74 |-> sh, 75 |-> sh, 76 |-> sh, 77 |-> sh, 78 |-> sh, 79 |-> sh, 80 |-> sh, 81 |-> sh, 
+             82 |-> sh, 83 |-> sh, 84 |-> sh, 85 |-> sh, 86 |-> sh, 87 |-> sh, 88 |-> sh, 89 |-> sh, fetchCount: 0 > .
+
+
+
+
+
+
+             
+eq config5 = < Tbl : TBL | Addr: ref(0)|-> 0, ref(5)|-> 0, ref(10)|-> 0,
+ 								   ref(1)|-> 1, ref(6)|-> 1, ref(11)|-> 1,
+ 								   ref(2)|-> 2, ref(7)|-> 2, ref(12)|-> 2,
+ 								   ref(3)|-> 3, ref(8)|-> 3, ref(13)|-> 3,
+ 								   ref(4)|-> 4, ref(9)|-> 4, ref(14)|-> 4,
+ 								   ref(15)|-> 5, ref(20)|-> 5, ref(25)|-> 5,
+ 								   ref(16)|-> 6, ref(21)|-> 6, ref(26)|-> 6,
+ 								   ref(17)|-> 7, ref(22)|-> 7, ref(27)|-> 7,
+ 								   ref(18)|-> 8, ref(23)|-> 8, ref(28)|-> 8,
+ 								   ref(19)|-> 9, ref(24)|-> 9, ref(29)|-> 9, 							
+ 								   ref(30)|-> 10, ref(35)|-> 10, ref(40)|-> 10,
+ 								   ref(31)|-> 11, ref(36)|-> 11, ref(41)|-> 11,
+ 								   ref(32)|-> 12, ref(37)|-> 12, ref(42)|-> 12,
+ 								   ref(33)|-> 13, ref(38)|-> 13, ref(43)|-> 13,
+ 								   ref(34)|-> 14, ref(39)|-> 14, ref(44)|-> 14,
+ 								   ref(45)|-> 15, ref(50)|-> 15, ref(55)|-> 15,
+ 								   ref(46)|-> 16, ref(51)|-> 16, ref(56)|-> 16,
+ 								   ref(47)|-> 17, ref(52)|-> 17, ref(57)|-> 17,
+ 								   ref(48)|-> 18, ref(53)|-> 18, ref(58)|-> 18,
+ 								   ref(49)|-> 19, ref(54)|-> 19, ref(59)|-> 19,
+ 					 		       ref(60)|-> 20, ref(65)|-> 20, ref(70)|-> 20,
+ 								   ref(61)|-> 21, ref(66)|-> 21, ref(71)|-> 21,
+ 								   ref(62)|-> 22, ref(67)|-> 22, ref(72)|-> 22,
+ 								   ref(63)|-> 23, ref(68)|-> 23, ref(73)|-> 23,
+ 								   ref(64)|-> 24, ref(69)|-> 24, ref(74)|-> 24,
+ 								   ref(75)|-> 25, ref(80)|-> 25, ref(85)|-> 25,
+ 								   ref(76)|-> 26, ref(81)|-> 26, ref(86)|-> 26,
+ 								   ref(77)|-> 27, ref(82)|-> 27, ref(87)|-> 27,
+ 								   ref(78)|-> 28, ref(83)|-> 28, ref(88)|-> 28,
+ 								   ref(79)|-> 29, ref(84)|-> 29, ref(89)|-> 29 >
+      
+			 < Ta : Task | Data: 'main |-> (Spawn('T1) ; Spawn('T2) ; Spawn('T3)),
+             					 'T1 |-> (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29) ;
+             					          read(30) ; write(85) ; read(30) ; write(40) ; read(30) ; write(40) ;
+             					          write(8) ; read(3) ; write(8) ; read(3) ; write(28) ; write(23) 
+             					          ) * 20,
+             					          
+             					 'T2 |-> (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59) ;
+             					 		  read(33) ; write(38) ; read(33) ; write(38) ; write(53) ; read(58) ; 
+             					 		  read(11) ; write(16) ; read(11) ; write(16) ; write(21) ; write(26) ;
+             					 		  read(71) ; read(66) ; write(61) ; write(16)
+             					 		  ) * 20, 
+             					 		  
+             					 		   
+             					          
+								 'T3 |-> (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89) ;
+             					          write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(67) ; read(62) ; read(67) ; read(62) ; read(77) ; read(82) ;
+             					          read(63) ; read(47) ; read(63) ; write(87)
+             					          ) * 20 >
+             					          
+			 < C1 : CR | Rst: (read(0) ; read(5) ; write(10) ; read(15) ; write(20) ; read(25) ;
+             					 		  read(30) ; write(35) ; read(40) ; write(45) ; read(50) ; write(55) ;
+             					          write(60) ; read(65) ; write(70) ; read(75) ; write(80) ; read(85) ;
+             					          write(3) ; read(8) ; write(13) ; read(18) ; write(23) ; write(28) ;
+             					          write(4) ; read(9) ; write(14) ; read(19) ; write(24) ; read(29) ;
+             					          read(30) ; write(85) ; read(30) ; write(40) ; read(30) ; write(40) ;
+             					          write(8) ; read(3) ; write(8) ; read(3) ; write(28) ; write(23) 
+             					          ) * 20, Levels: 1 >	
+             < Lev(1, C1) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >
+             < Lev(2, C1) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >
+             < Lev(3, C1) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >
+             	
+             < C2 : CR | Rst: (read(1) ; read(6) ; read(11) ; write(16) ; read(21) ; write(26) ; 
+             					 		  read(31) ; read(36) ; write(41) ; read(46) ; write(51) ; read(56) ;
+             					 		  read(61) ; read(66) ; write(71) ; read(76) ; write(81) ; read(86) ;
+             					 		  read(33) ; write(38) ; read(43) ; write(48) ; write(53) ; read(58) ;
+             					 		  read(34) ; write(39) ; read(44) ; write(49) ; read(54) ; write(59) ;
+             					 		  read(33) ; write(38) ; read(33) ; write(38) ; write(53) ; read(58) ; 
+             					 		  read(11) ; write(16) ; read(11) ; write(16) ; write(21) ; write(26) ;
+             					 		  read(71) ; read(66) ; write(61) ; write(16)
+             					 		  ) * 20, Levels: 2 >
+             < Lev(1, C2) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C2) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >	
+             < Lev(3, C2) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             	            	
+             < C3 : CR | Rst: (read(2) ; write(7) ; read(12) ; write(17) ; read(22) ; read(27) ;
+             					 		  write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(62) ; write(67) ; read(72) ; read(77) ; write(82) ; read(87) ; 
+             					          write(63) ; read(68) ; write(73) ; write(78) ; read(83) ; write(88) ; 
+             					          write(64) ; read(69) ; write(74) ; write(79) ; read(84) ; read(89) ;
+             					          write(32) ; read(37) ; write(42) ; read(47) ; read(52) ; read(57) ;
+             					          read(67) ; read(62) ; read(67) ; read(62) ; read(77) ; read(82) ;
+             					          read(63) ; read(47) ; read(63) ; write(87)
+             					          ) * 20, Levels: 3 >	
+             < Lev(1, C3) : Cache | CM: empty, D: nil, Penalty: 1, CacheSz: 5, Assoc: Assoc(1), Lflag: false >	
+             < Lev(2, C3) : Cache | CM: empty, D: nil, Penalty: 10, CacheSz: 10, Assoc: Assoc(2), Lflag: false >	
+             < Lev(3, C3) : Cache | CM: empty, D: nil, Penalty: 100, CacheSz: 15, Assoc: Assoc(3), Lflag: true >	
+             	
+             ***< Sch : Qu | TidSet: 'main > 
+             < Mp(C1) : MP | mp: 0 >
+             < Mp(C2) : MP | mp: 0 >
+             < Mp(C3) : MP | mp: 0 >
+             < M : MM | M: 0 |-> sh, 1 |-> sh, 2 |-> sh, 3 |-> sh, 4 |-> sh, 5 |-> sh, 6 |-> sh, 7 |-> sh, 
+             8 |-> sh, 9 |-> sh, 10 |-> sh, 11 |-> sh, 12 |-> sh, 13 |-> sh, 14 |-> sh, 15 |-> sh, 16 |-> sh, 17 |-> sh, 
+             18 |-> sh, 19 |-> sh, 20 |-> sh, 21 |-> sh, 22 |-> sh, 23 |-> sh, 24 |-> sh, 25 |-> sh, 26 |-> sh, 27 |-> sh, 28 |-> sh,
+             29 |-> sh, 30 |-> sh, 31 |-> sh, 32 |-> sh, 33 |-> sh, 34 |-> sh, 35 |-> sh, 36 |-> sh, 37 |-> sh, 38 |-> sh, 
+             39 |-> sh, 40 |-> sh, 41 |-> sh, 42 |-> sh, 43 |-> sh, 44 |-> sh, 45 |-> sh, 46 |-> sh, 47 |-> sh, 48 |-> sh, 49 |-> sh,
+             50 |-> sh, 51 |-> sh, 52 |-> sh, 53 |-> sh, 54 |-> sh, 55 |-> sh, 56 |-> sh, 57 |-> sh, 58 |-> sh, 59 |-> sh,
+             60 |-> sh, 61 |-> sh, 62 |-> sh, 63 |-> sh, 64 |-> sh, 65 |-> sh, 66 |-> sh, 67 |-> sh, 68 |-> sh, 69 |-> sh, 70 |-> sh,
+             71 |-> sh, 72 |-> sh, 73 |-> sh, 74 |-> sh, 75 |-> sh, 76 |-> sh, 77 |-> sh, 78 |-> sh, 79 |-> sh, 80 |-> sh, 81 |-> sh, 
+             82 |-> sh, 83 |-> sh, 84 |-> sh, 85 |-> sh, 86 |-> sh, 87 |-> sh, 88 |-> sh, 89 |-> sh, fetchCount: 0 > .
+             
+             
+                             						 
+endm
+
+
+	

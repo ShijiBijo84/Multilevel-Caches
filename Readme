@@ -1,0 +1,79 @@
+
+This Readme contains information concerning the use of the Maude implementation of our model of parallel architectures.
+
+
+* Pre-requisites
+  -------------------
+  
+  Maude 2 or higher 
+  Maude home-page http://maude.cs.uiuc.edu.
+  
+* Explanation of files
+  --------------------------
+  1. core-config-parallel.maude
+  
+      This module explains the run-time syntax of the operational semantics. 
+      
+  2. architecture-parallel.maude
+  
+      This module explains various objects in the configuration and the cache 
+      memory structure on the basis of associativity. It also explains about 
+      main memory architecture.
+      
+  3. local-rules-parallel.maude
+  
+      It includes rewriting rules and equations for global and local semantics.
+     
+  4. core-test-parallel.maude
+  
+      This module shows some initial configurations namely config0, config1,...
+      These configurations can be used for simulations.
+  
+      
+ * How to simulate  this Maude model
+   ---------------------------------------  
+        Download the file 'multilevel.zip' and extract it. Change the folder to 
+        'maude-multilevel-cache'. After changing the folder, invoke the Maude 
+        interpreter.Then type 'load multilevel-test.maude'. The  'multilevel-test.maude' 
+        module will bring all other modules in Maude user-interface. Then the 
+        'frew {config0}' command will simulate the initial configuration config0. 
+        All other configurations can be simulated in the same way.
+            
+               
+  * init function
+   -------------------------
+      We can use init function to create objects at run-time, instead of manually providing 
+      all objects in initial configuration. We should provide the task table manually as a 
+      different configuration. For example,
+          eq config4 = init((cores# 3, caches# 1) Ref(11, 1) Mem(21) config3) .
+      will generate an initial configuration config4 where the task table is from config3.
+      The auxiliary functions in init are:
+      
+      (cores# 3, caches# 1) - Creates three core objects each with single level caches.
+      Ref(11, 1) - Creates a reference table of 11 references where each reference is mapped 
+                   to a unique memory address.
+      Mem(21) - Creates a memory object with 21 memory blocks and each with shared status.
+      createMain(10, 100) - Creates 10 tasks where each tasks has 100 instructions and instructions 
+      					are not using shared data.
+      createMain2(10, 100) - Creates 10 tasks where each tasks has 100 instructions and some instructions 
+      					are using shared data					
+      
+      After creating all of these objects, a scheduler object is created with 'main as initial 
+      task identifier. The command frew{config4} will first create initial configuration as 
+      above using init function and then simulate it.             
+              
+
+* Explanation for initial configurations  
+    -----------------------------------------
+    config0  - Simulation of config0 illustrates data layout with single word size memory blocks.  
+    
+    config1  - Illustrates 2 word size memory blocks.
+     		   
+    config2  - 	Each block has 3 words.
+    config3 -  Automatically creates a configuration with tasks which are not using shared data and 
+    			simulates. 
+    config4 - Automatically creates a configuration with tasks which are  using shared data and 
+    			simulates.
+    
+                      
+    
